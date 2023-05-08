@@ -20,6 +20,6 @@ namespace MediaPlayerApp {
 			std::string getImageUrl();
 			void setMedia(std::vector<Media> media);
 			std::vector<Media> getMedia();
-			Category(std::string name, std::string imageUrl, std::vector<Media> media);
+			Category(std::string name, std::string imageUrl, std::vector<Media> media = std::vector<Media>());
 	};
 }

@@ -121,16 +121,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddCategoryForm.cpp" />
     <ClCompile Include="CategoriesForm.cpp" />
     <ClCompile Include="Category.cpp" />
+    <ClCompile Include="CategoryForm.cpp" />
     <ClCompile Include="MainForm.cpp" />
     <ClCompile Include="Media.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddCategoryForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="CategoriesForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Category.h" />
+    <ClInclude Include="CategoryForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -138,8 +146,14 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddCategoryForm.resx">
+      <DependentUpon>AddCategoryForm.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CategoriesForm.resx">
       <DependentUpon>CategoriesForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CategoryForm.resx">
+      <DependentUpon>CategoryForm.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.h</DependentUpon>
@@ -147,6 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaPlayerApp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Downloads\c- (1).png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

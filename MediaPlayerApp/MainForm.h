@@ -1,5 +1,6 @@
 #pragma once
 #include "CategoriesForm.h"
+#include "resource.h"
 
 namespace MediaPlayerApp {
 
@@ -146,6 +147,7 @@ namespace MediaPlayerApp {
 	private: System::Void StartButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		CategoriesForm^ form = gcnew CategoriesForm;
 		form->Show();
+		this->Close();
 	}
 };
 }
