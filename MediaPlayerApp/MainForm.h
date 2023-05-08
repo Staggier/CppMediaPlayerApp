@@ -40,7 +40,7 @@ namespace MediaPlayerApp {
 	private: System::Windows::Forms::PictureBox^ AppLogo;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Button^ StartButton;
-	private: System::Windows::Forms::Button^ LoadButton;
+
 
 
 	protected:
@@ -65,7 +65,6 @@ namespace MediaPlayerApp {
 			this->AppLogo = (gcnew System::Windows::Forms::PictureBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->StartButton = (gcnew System::Windows::Forms::Button());
-			this->LoadButton = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->AppLogo))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -105,24 +104,13 @@ namespace MediaPlayerApp {
 			// StartButton
 			// 
 			this->StartButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14));
-			this->StartButton->Location = System::Drawing::Point(338, 394);
+			this->StartButton->Location = System::Drawing::Point(338, 479);
 			this->StartButton->Name = L"StartButton";
 			this->StartButton->Size = System::Drawing::Size(154, 48);
 			this->StartButton->TabIndex = 3;
 			this->StartButton->Text = L"Start";
 			this->StartButton->UseVisualStyleBackColor = true;
 			this->StartButton->Click += gcnew System::EventHandler(this, &MainForm::StartButton_Click);
-			// 
-			// LoadButton
-			// 
-			this->LoadButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
-			this->LoadButton->Location = System::Drawing::Point(338, 472);
-			this->LoadButton->Name = L"LoadButton";
-			this->LoadButton->Size = System::Drawing::Size(154, 48);
-			this->LoadButton->TabIndex = 4;
-			this->LoadButton->Text = L"Load";
-			this->LoadButton->UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
@@ -131,11 +119,11 @@ namespace MediaPlayerApp {
 			this->AutoSize = true;
 			this->BackColor = System::Drawing::Color::LightSteelBlue;
 			this->ClientSize = System::Drawing::Size(850, 650);
-			this->Controls->Add(this->LoadButton);
 			this->Controls->Add(this->StartButton);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->AppLogo);
 			this->Controls->Add(this->WelcomeLabel);
+			this->MaximizeBox = false;
 			this->Name = L"MainForm";
 			this->Text = L"MainForm";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->AppLogo))->EndInit();

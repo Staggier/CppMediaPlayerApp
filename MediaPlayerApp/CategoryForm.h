@@ -1,5 +1,7 @@
 #pragma once
 #include "Category.h"
+#include <iostream>
+#include <fstream>
 #include <msclr\marshal_cppstd.h>
 
 namespace MediaPlayerApp {
@@ -10,6 +12,7 @@ namespace MediaPlayerApp {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::IO;
 
 	/// <summary>
 	/// Summary for CategoryForm
@@ -21,6 +24,11 @@ namespace MediaPlayerApp {
 		CategoryForm(Category category, int index) {
 			InitializeComponent();
 
+			String^ mediaFilename = gcnew String((category.getName() + std::string(".txt")).c_str());
+			if (!File::Exists(mediaFilename)) {
+				std::ofstream mediaFile(msclr::interop::marshal_as<std::string>(mediaFilename));
+			}
+
 			this->index = index;
 			CategoryNameTextBox->Text = gcnew String(category.getName().c_str());
 			ImageUrlTextBox->Text = gcnew String(category.getImageUrl().c_str());
@@ -28,6 +36,10 @@ namespace MediaPlayerApp {
 			
 			MediaListView->View = View::List;
 			MediaListView->Items->Clear();
+
+			for (Media media : LoadMedia(category.getName())) {
+				MediaListView->Items->Add(gcnew String(media.getName().c_str()));
+			}
 
 			//MediaListView->Items->Add(gcnew String("C:\\Users\\Jordan\\Downloads\\vid.mp4"));
 		}
@@ -49,15 +61,16 @@ namespace MediaPlayerApp {
 	private: System::Windows::Forms::ListView^ MediaListView;
 
 	private: System::Windows::Forms::Button^ BackButton;
-	private: System::Windows::Forms::Button^ EditButton;
+
 	private: System::Windows::Forms::Button^ AddMediaButton;
 
 	private: System::Windows::Forms::TextBox^ CategoryNameTextBox;
 
 	private: System::Windows::Forms::TextBox^ ImageUrlTextBox;
+	private: System::Windows::Forms::Button^ ClearMediaButton;
 
 
-	private: System::Windows::Forms::Button^ DeleteCategoryButton;
+
 
 	protected:
 
@@ -81,11 +94,10 @@ namespace MediaPlayerApp {
 			this->ImageUrlLabel = (gcnew System::Windows::Forms::Label());
 			this->MediaListView = (gcnew System::Windows::Forms::ListView());
 			this->BackButton = (gcnew System::Windows::Forms::Button());
-			this->EditButton = (gcnew System::Windows::Forms::Button());
 			this->AddMediaButton = (gcnew System::Windows::Forms::Button());
 			this->CategoryNameTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->ImageUrlTextBox = (gcnew System::Windows::Forms::TextBox());
-			this->DeleteCategoryButton = (gcnew System::Windows::Forms::Button());
+			this->ClearMediaButton = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->CategoryImage))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -125,7 +137,7 @@ namespace MediaPlayerApp {
 			this->MediaListView->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->MediaListView->HideSelection = false;
-			this->MediaListView->Location = System::Drawing::Point(280, 207);
+			this->MediaListView->Location = System::Drawing::Point(280, 227);
 			this->MediaListView->Name = L"MediaListView";
 			this->MediaListView->Size = System::Drawing::Size(452, 243);
 			this->MediaListView->TabIndex = 3;
@@ -144,18 +156,6 @@ namespace MediaPlayerApp {
 			this->BackButton->UseVisualStyleBackColor = true;
 			this->BackButton->Click += gcnew System::EventHandler(this, &CategoryForm::BackButton_Click);
 			// 
-			// EditButton
-			// 
-			this->EditButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
-			this->EditButton->Location = System::Drawing::Point(71, 324);
-			this->EditButton->Name = L"EditButton";
-			this->EditButton->Size = System::Drawing::Size(157, 55);
-			this->EditButton->TabIndex = 5;
-			this->EditButton->Text = L"Edit";
-			this->EditButton->UseVisualStyleBackColor = true;
-			this->EditButton->Click += gcnew System::EventHandler(this, &CategoryForm::EditButton_Click);
-			// 
 			// AddMediaButton
 			// 
 			this->AddMediaButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
@@ -170,6 +170,7 @@ namespace MediaPlayerApp {
 			// 
 			// CategoryNameTextBox
 			// 
+			this->CategoryNameTextBox->Enabled = false;
 			this->CategoryNameTextBox->Font = (gcnew System::Drawing::Font(L"Calibri", 16, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->CategoryNameTextBox->Location = System::Drawing::Point(465, 38);
@@ -179,6 +180,7 @@ namespace MediaPlayerApp {
 			// 
 			// ImageUrlTextBox
 			// 
+			this->ImageUrlTextBox->Enabled = false;
 			this->ImageUrlTextBox->Font = (gcnew System::Drawing::Font(L"Calibri", 16, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->ImageUrlTextBox->Location = System::Drawing::Point(465, 135);
@@ -186,17 +188,17 @@ namespace MediaPlayerApp {
 			this->ImageUrlTextBox->Size = System::Drawing::Size(267, 47);
 			this->ImageUrlTextBox->TabIndex = 8;
 			// 
-			// DeleteCategoryButton
+			// ClearMediaButton
 			// 
-			this->DeleteCategoryButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->ClearMediaButton->Font = (gcnew System::Drawing::Font(L"Calibri", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->DeleteCategoryButton->Location = System::Drawing::Point(71, 517);
-			this->DeleteCategoryButton->Name = L"DeleteCategoryButton";
-			this->DeleteCategoryButton->Size = System::Drawing::Size(157, 55);
-			this->DeleteCategoryButton->TabIndex = 9;
-			this->DeleteCategoryButton->Text = L"Delete";
-			this->DeleteCategoryButton->UseVisualStyleBackColor = true;
-			this->DeleteCategoryButton->Click += gcnew System::EventHandler(this, &CategoryForm::DeleteCategoryButton_Click);
+			this->ClearMediaButton->Location = System::Drawing::Point(40, 517);
+			this->ClearMediaButton->Name = L"ClearMediaButton";
+			this->ClearMediaButton->Size = System::Drawing::Size(177, 55);
+			this->ClearMediaButton->TabIndex = 9;
+			this->ClearMediaButton->Text = L"Clear Media";
+			this->ClearMediaButton->UseVisualStyleBackColor = true;
+			this->ClearMediaButton->Click += gcnew System::EventHandler(this, &CategoryForm::ClearMediaButton_Click);
 			// 
 			// CategoryForm
 			// 
@@ -204,16 +206,16 @@ namespace MediaPlayerApp {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::Color::SteelBlue;
 			this->ClientSize = System::Drawing::Size(828, 594);
-			this->Controls->Add(this->DeleteCategoryButton);
+			this->Controls->Add(this->ClearMediaButton);
 			this->Controls->Add(this->ImageUrlTextBox);
 			this->Controls->Add(this->CategoryNameTextBox);
 			this->Controls->Add(this->AddMediaButton);
-			this->Controls->Add(this->EditButton);
 			this->Controls->Add(this->BackButton);
 			this->Controls->Add(this->MediaListView);
 			this->Controls->Add(this->ImageUrlLabel);
 			this->Controls->Add(this->CategoryImage);
 			this->Controls->Add(this->CategoryNameLabel);
+			this->MaximizeBox = false;
 			this->Name = L"CategoryForm";
 			this->Text = L"CategoryForm";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->CategoryImage))->EndInit();
@@ -239,10 +241,6 @@ namespace MediaPlayerApp {
 		ShowAndRemoveOwnedForm();
 	}
 
-	private: System::Void DeleteCategoryButton_Click(System::Object^ sender, System::EventArgs^ e) {
-		ShowAndRemoveOwnedForm();
-	}
-
 	private: System::Void MediaListView_Click(System::Object^ sender, System::EventArgs^ e) {
 		Point mousePosition = MediaListView->PointToClient(Control::MousePosition);
 		ListView^ listView = safe_cast<ListView^>(sender);
@@ -254,6 +252,37 @@ namespace MediaPlayerApp {
 		}
 	}
 
+	public: System::Void static AddMediaToFile(std::string filename, Media media) {
+		std::fstream mediaFile;
+		mediaFile.open(filename, std::ios_base::app);
+
+		mediaFile << media.getName() << std::endl;
+	}
+
+	public: std::vector<Media> LoadMedia(std::string categoryName) {
+		std::ifstream mediaFile;
+
+		mediaFile.open((categoryName + std::string(".txt")).c_str());
+
+		std::vector<Media> media;
+		std::string line;
+
+		while (std::getline(mediaFile, line)) {
+			media.push_back(Media(line));
+		}
+
+		return media;
+	}
+
+	private: Category getCategory() {
+		Category category = Category(
+			msclr::interop::marshal_as<std::string>(CategoryNameTextBox->Text).c_str(),
+			msclr::interop::marshal_as<std::string>(ImageUrlTextBox->Text).c_str()
+		);
+
+		return category;
+	}
+
 	private: System::Void AddMediaButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		OpenFileDialog ofd;
 		ofd.ShowDialog();
@@ -261,7 +290,23 @@ namespace MediaPlayerApp {
 		if (ofd.FileName != "") {
 			std::string filename = msclr::interop::marshal_as<std::string>(ofd.FileName);
 			MediaListView->Items->Add(gcnew String(filename.c_str()));
+
+			Category category = getCategory();
+
+			String^ mediaFilename = gcnew String((category.getName() + std::string(".txt")).c_str());
+			CategoryForm::AddMediaToFile(msclr::interop::marshal_as<std::string>(mediaFilename), Media(filename));
 		}
+	}
+	private: System::Void ClearMediaButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		Category category = getCategory();
+		String^ mediaFilename = gcnew String((category.getName() + std::string(".txt")).c_str());
+
+		// remove Media file to clear its contents
+		remove((category.getName() + std::string(".txt")).c_str());
+
+		// re-create Media file and clear the List View
+		std::ofstream mediaFile(msclr::interop::marshal_as<std::string>(mediaFilename));
+		MediaListView->Items->Clear();
 	}
 };
 }

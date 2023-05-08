@@ -1,9 +1,12 @@
 #pragma once
-#include "AddCategoryForm.h"
 #include <vector>
 #include <string>
+#include <fstream>
 #include "Category.h"
 #include "CategoryForm.h"
+#include "AddCategoryForm.h"
+#include <msclr\marshal_cppstd.h>
+
 
 namespace MediaPlayerApp {
 
@@ -13,6 +16,7 @@ namespace MediaPlayerApp {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::IO;
 
 	/// <summary>
 	/// Summary for CategoriesForm
@@ -87,7 +91,7 @@ namespace MediaPlayerApp {
 			this->CategoriesListView->Size = System::Drawing::Size(463, 388);
 			this->CategoriesListView->TabIndex = 1;
 			this->CategoriesListView->UseCompatibleStateImageBehavior = false;
-			this->CategoriesListView->Click += gcnew System::EventHandler(this, &CategoriesForm::CategoriesListViewClicked);
+			this->CategoriesListView->Click += gcnew System::EventHandler(this, &CategoriesForm::CategoriesListView_Clicked);
 			// 
 			// AddCategoryButton
 			// 
@@ -123,17 +127,24 @@ namespace MediaPlayerApp {
 			this->Controls->Add(this->AddCategoryButton);
 			this->Controls->Add(this->CategoriesListView);
 			this->Controls->Add(this->label1);
+			this->MaximizeBox = false;
 			this->Name = L"CategoriesForm";
 			this->Text = L"CategoriesForm";
-			this->Shown += gcnew System::EventHandler(this, &CategoriesForm::OnCategoriesPageShown);
+			this->Shown += gcnew System::EventHandler(this, &CategoriesForm::OnCategoriesPage_Shown);
+			this->VisibleChanged += gcnew System::EventHandler(this, &CategoriesForm::OnCategoriesPage_Shown);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
 	private: System::Void ClearCategoriesButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		// Remove and re-create the Categories file
+		remove(Category::getFileName().c_str());
+		std::ofstream categoriesFile(Category::getFileName());
+
 		CategoriesListView->Items->Clear();
 	}
+
 	private: System::Void AddCategoryButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		AddCategoryForm^ form = gcnew AddCategoryForm;
 		form->AddOwnedForm(this);
@@ -141,20 +152,61 @@ namespace MediaPlayerApp {
 		form->Show();
 		this->Hide();
 	}
+	
 
-	public: std::vector<Category> static LoadCategories() {
+	public: System::Void static AddCategoryToFile(Category category) {
+		std::fstream categoryFile;
+		categoryFile.open(Category::getFileName(), std::ios_base::app);
 
+		categoryFile << category.getName().c_str() << std::endl;
+		categoryFile << category.getImageUrl().c_str() << std::endl;
+	}
 
+	public: std::vector<Category> static GetDefaultCategories() {
 		std::vector<Category> v = {
-			Category(std::string("Movies"), std::string("C:\\Users\\Jordan\\Downloads\\c- (1).png")),
-			Category(std::string("Shows"), std::string("C:\\Users\\Jordan\\Downloads\\c- (1).png")),
-			Category(std::string("Miscellaneous"), std::string("C:\\Users\\Jordan\\Downloads\\c- (1).png"))
+				Category(std::string("Movies"), std::string("c- (1).png")),
+				Category(std::string("Shows"), std::string("c- (1).png")),
+				Category(std::string("Miscellaneous"), std::string("c- (1).png"))
 		};
-		
+
+		std::ofstream categoryFile(Category::getFileName());
+		for (Category c : v) {
+			AddCategoryToFile(c);
+		}
+
 		return v;
 	}
 
-	private: System::Void CategoriesListViewClicked(System::Object^ sender, System::EventArgs^ e) {
+	// Load Categories from a file or from default settings
+	public: std::vector<Category> static LoadCategories() {
+		if (File::Exists(gcnew String(Category::getFileName().c_str()))) {
+			std::ifstream categoryFile;
+			categoryFile.open(Category::getFileName());
+
+			std::string line;
+			int mediaCount = 0;
+
+			std::vector<Category> categories;
+
+			while (std::getline(categoryFile, line)) {
+				// The first line of the file should always be the Category title
+				Category category = Category(line, "");
+				std::getline(categoryFile, line);
+
+				// The second line of the file should always be the Image URL of the Category
+				category.setImageUrl(line);
+
+				categories.push_back(category);
+			}
+
+			return categories;
+		}
+		else {
+			return CategoriesForm::GetDefaultCategories();
+		}
+	}
+
+	private: System::Void CategoriesListView_Clicked(System::Object^ sender, System::EventArgs^ e) {
 		Point mousePosition = CategoriesListView->PointToClient(Control::MousePosition);
 		ListView^ listView = safe_cast<ListView^>(sender);
 		ListViewHitTestInfo^ hitTest = (*listView).HitTest(mousePosition.X, mousePosition.Y);
@@ -168,7 +220,7 @@ namespace MediaPlayerApp {
 		}
 	}
 
-	private: System::Void OnCategoriesPageShown(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void OnCategoriesPage_Shown(System::Object^ sender, System::EventArgs^ e) {
 		CategoriesListView->View = View::List;
 		CategoriesListView->Items->Clear();
 

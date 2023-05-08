@@ -1,5 +1,8 @@
 #pragma once
-//#include "CategoriesForm.h"
+#include <iostream>
+#include <fstream>
+#include <msclr\marshal_cppstd.h>
+#include "Category.h"
 
 namespace MediaPlayerApp {
 
@@ -9,6 +12,7 @@ namespace MediaPlayerApp {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::IO;
 
 	/// <summary>
 	/// Summary for AddCategoryForm
@@ -121,6 +125,7 @@ namespace MediaPlayerApp {
 			this->ImageUrlTextBox->Name = L"ImageUrlTextBox";
 			this->ImageUrlTextBox->Size = System::Drawing::Size(429, 37);
 			this->ImageUrlTextBox->TabIndex = 4;
+			this->ImageUrlTextBox->Click += gcnew System::EventHandler(this, &AddCategoryForm::ImageUrlTextBox_Click);
 			// 
 			// groupBox1
 			// 
@@ -172,6 +177,7 @@ namespace MediaPlayerApp {
 			this->Controls->Add(this->CancelButton);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->label1);
+			this->MaximizeBox = false;
 			this->Name = L"AddCategoryForm";
 			this->Text = L"AddCategoryForm";
 			this->groupBox1->ResumeLayout(false);
@@ -188,10 +194,29 @@ namespace MediaPlayerApp {
 		this->RemoveOwnedForm(this->OwnedForms[0]);
 		this->Close();
 	}
+
 	private: System::Void AddButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		std::fstream categoryFile;
+		categoryFile.open(Category::getFileName(), std::ios_base::app);
+
+		categoryFile << msclr::interop::marshal_as<std::string>(NameTextBox->Text) << std::endl;
+		categoryFile << msclr::interop::marshal_as<std::string>(ImageUrlTextBox->Text) << std::endl;
+
+		categoryFile.close();
+
 		this->OwnedForms[0]->Show();
+		Form^ form = this->OwnedForms[0];
 		this->RemoveOwnedForm(this->OwnedForms[0]);
 		this->Close();
+	}
+
+	private: System::Void ImageUrlTextBox_Click(System::Object^ sender, System::EventArgs^ e) {
+		OpenFileDialog ofd;
+		ofd.ShowDialog();
+
+		if (ofd.FileName != "") {
+			ImageUrlTextBox->Text = ofd.FileName;
+		}
 	}
 };
 }

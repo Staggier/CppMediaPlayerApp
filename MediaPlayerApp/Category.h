@@ -14,6 +14,7 @@ namespace MediaPlayerApp {
 			std::vector<Media> media;
 
 		public:
+			static std::string getFileName();
 			void setName(std::string name);
 			std::string getName();
 			void setImageUrl(std::string imageUrl);

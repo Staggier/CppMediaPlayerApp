@@ -9,6 +9,10 @@ Category::Category(string name, string imageUrl, vector<Media> media) {
 	this->media = media;
 }
 
+string Category::getFileName() {
+	return "categories.txt";
+}
+
 string Category::getName() {
 	return this->name;
 }
